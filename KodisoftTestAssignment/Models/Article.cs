@@ -8,7 +8,7 @@ namespace KodisoftTestAssignment.Models
 {
     public class Article
     {
-        public NewsProvider Source { get; set; }
+        public RssFeed Source { get; set; }
 
         public string Author { get; set; }
 

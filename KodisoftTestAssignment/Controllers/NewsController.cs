@@ -8,61 +8,71 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KodisoftTestAssignment.Controllers
 {
-    [Route("news")]
+    [Route("api/[controller]")]
     public class NewsController : Controller
     {
-        private const string apikey = "f66f7f3881f8473aa596e6898bfe1f24";
-
         // GET news
         [HttpGet]
         public string Get()
         {
             // Recieving top-trending headlines from API
+            var webClient = new WebClient();
+            webClient.Headers[HttpRequestHeader.Authorization] = "Bearer f66f7f3881f8473aa596e6898bfe1f24";
 
-            var url = "https://newsapi.org/v2/top-headlines?" + "country=us&" + "apiKey=" + apikey;
+            var url = "https://newsapi.org/v2/top-headlines?" + "country=us&" + "apiKey=f66f7f3881f8473aa596e6898bfe1f24";
 
-            var json = new WebClient().DownloadString(url);
+            var json = webClient.DownloadString(url);
             
 
             // var newsJson = JsonConvert.SerializeObject(news);
 
             return json;
         }
-        
-        // GET news/feedlist
-        [HttpGet("/feedlist")]
-        public List<Feed> GetFeedList()
-        {
-            var feedList = new List<Feed>();
-
-            // Here we should have call to service method, that will get all feeds of this user from DB
-
-            return feedList;
-        }
 
         // GET news/5
         [HttpGet("{id}")]
         public string Get(int id)
         {
-            var url = "https://newsapi.org/v2/top-headlines?" + "country=us&" + "apiKey=" + apikey;
+            var webClient = new WebClient();
+            webClient.Headers[HttpRequestHeader.Authorization] = "Bearer f66f7f3881f8473aa596e6898bfe1f24";
+            var url = "https://newsapi.org/v2/top-headlines?" + "country=us&";
 
-            var json = new WebClient().DownloadString(url);
+            var json = webClient.DownloadString(url);
 
             System.Diagnostics.Debug.WriteLine(json);
 
             return json;
         }
 
+        // GET news/feedlist
+        [Route("/feedlist")]
+        [HttpGet]
+        public List<FeedCollection> GetFeedList()
+        {
+            var feedList = new List<FeedCollection>();
+
+            // Here we should have call to service method, that will get all feeds of this user from DB
+
+            return feedList;
+        }
+
         // POST news
         [HttpPost]
-        public void Post([FromBody]string value)
+        public int Post([FromBody]string name)
         {
+            // Create collection with specified name
+            // Collection id should be returned
+            var id = 0; // placeholder
+
+            return id;
+
         }
 
         // PUT news/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        [HttpPut("{collectionId}")]
+        public void Put(int collectionId, [FromBody]string feedId)
         {
+            // Add feed to a collection
         }
 
         // DELETE news/5
