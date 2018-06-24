@@ -10,11 +10,11 @@ using KodisoftTestAssignment.Interfaces;
 
 namespace KodisoftTestAssignment.Services
 {
-    public partial class Services
+    public partial class NewsServices
     {
-        public static IFeed GetFeed(string id)
+        public IFeed GetFeed(string id)
         {
-            return new RssFeed();
+            throw new NotImplementedException();
         }
         
         public IEnumerable<IFeed> Parse(string url, FeedType feedType)

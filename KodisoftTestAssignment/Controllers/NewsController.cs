@@ -4,13 +4,23 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using KodisoftTestAssignment.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace KodisoftTestAssignment.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     public class NewsController : Controller
     {
+        ILogger<NewsController> _logger;
+        
+        public NewsController(ILogger<NewsController> logger)
+        {
+            _logger = logger;
+        }
+
         // GET news
         [HttpGet]
         public string Get()

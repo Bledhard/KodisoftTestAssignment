@@ -8,8 +8,10 @@ namespace KodisoftTestAssignment.Models
 {
     public class FeedCollection
     {
-        public string Name { get; set; }
+        public int ID { get; set; }
 
-        public List<IFeed> Feeds { get; set; }
+        public int UserID { get; set; }
+
+        public string Title { get; set; }
     }
 }

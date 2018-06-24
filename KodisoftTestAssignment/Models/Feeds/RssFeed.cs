@@ -9,12 +9,12 @@ namespace KodisoftTestAssignment.Models
 {
     public class RssFeed : IFeed
     {
+        public int ID { get; set; }
         public string Link { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
         public DateTime PublishDate { get; set; }
         public FeedType FeedType { get; set; }
-        public List<Article> CachedArticles { get; set; }
 
         public RssFeed()
         {

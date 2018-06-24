@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace KodisoftTestAssignment.Services
+namespace KodisoftTestAssignment
 {
     public class IpFindService
     {

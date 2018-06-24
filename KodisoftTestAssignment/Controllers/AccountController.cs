@@ -12,6 +12,7 @@ using JWT.Algorithms;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using KodisoftTestAssignment.Models;
+using Microsoft.Extensions.Logging;
 
 namespace KodisoftTestAssignment.Controllers
 {
@@ -21,78 +22,91 @@ namespace KodisoftTestAssignment.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly JWTSettings _options;
+        ILogger<NewsController> _logger;
 
         public AccountController(
           UserManager<IdentityUser> userManager,
           SignInManager<IdentityUser> signInManager,
-          IOptions<JWTSettings> optionsAccessor)
+          IOptions<JWTSettings> optionsAccessor,
+          ILogger<NewsController> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _options = optionsAccessor.Value;
+            _logger = logger;
         }
 
         [HttpPost("sign-in")]
-        public async Task<IActionResult> SignIn([FromBody] Credentials Credentials)
+        public async Task<IActionResult> SignIn([FromBody] Credentials credentials)
         {
+            _logger.LogTrace("SignIn Attempt for " + credentials.Email);
+
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(Credentials.Email, Credentials.Password, false, false);
+                var result = await _signInManager.PasswordSignInAsync(credentials.Email, credentials.Password, false, false);
                 if (result.Succeeded)
                 {
-                    var user = await _userManager.FindByEmailAsync(Credentials.Email);
+                    var user = await _userManager.FindByEmailAsync(credentials.Email);
+                    _logger.LogTrace(credentials.Email + "was successfully signed in.");
                     return new JsonResult(new Dictionary<string, object>
                     {
-                    { "access_token", GetAccessToken(Credentials.Email) },
+                    { "access_token", GetAccessToken(credentials.Email) },
                     { "id_token", GetIdToken(user) }
                     });
                 }
+                _logger.LogTrace(credentials.Email + " attempt to sign-in was unsuccessful.");
                 return new JsonResult("Unable to sign in") { StatusCode = 401 };
             }
+            _logger.LogError("Unexpected error happened while signing-in \"" + credentials.Email + "\"");
             return Error("Unexpected error");
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register([FromBody] Credentials Credentials)
+        public async Task<IActionResult> Register([FromBody] Credentials credentials)
         {
+            _logger.LogTrace("Registration attempt for " + credentials.Email);
+
             if (ModelState.IsValid)
             {
-                var user = new IdentityUser { UserName = Credentials.Email, Email = Credentials.Email };
-                var result = await _userManager.CreateAsync(user, Credentials.Password);
+                var user = new IdentityUser { UserName = credentials.Email, Email = credentials.Email };
+                var result = await _userManager.CreateAsync(user, credentials.Password);
                 if (result.Succeeded)
                 {
+                    _logger.LogTrace("New user \"" + credentials.Email + "\" registered.");
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return new JsonResult(new Dictionary<string, object>
-          {
-            { "access_token", GetAccessToken(Credentials.Email) },
-            { "id_token", GetIdToken(user) }
-          });
+                    {
+                        { "access_token", GetAccessToken(credentials.Email) },
+                        { "id_token", GetIdToken(user) }
+                    });
                 }
+                _logger.LogError(String.Format("Error happened while signing-up \"" + credentials.Email + "\" (code(s): {0}", String.Join(",", result.Errors.Select(e => e.Code))));
                 return Errors(result);
 
             }
+            _logger.LogError("Unexpected error happened while signing-up \"" + credentials.Email + "\"");
             return Error("Unexpected error");
         }
 
         private string GetIdToken(IdentityUser user)
         {
             var payload = new Dictionary<string, object>
-      {
-        { "id", user.Id },
-        { "sub", user.Email },
-        { "email", user.Email },
-        { "emailConfirmed", user.EmailConfirmed },
-      };
+            {
+                { "id", user.Id },
+                { "sub", user.Email },
+                { "email", user.Email },
+                { "emailConfirmed", user.EmailConfirmed },
+            };
             return GetToken(payload);
         }
 
         private string GetAccessToken(string Email)
         {
             var payload = new Dictionary<string, object>
-      {
-        { "sub", Email },
-        { "email", Email }
-      };
+            {
+                { "sub", Email },
+                { "email", Email }
+            };
             return GetToken(payload);
         }
 
