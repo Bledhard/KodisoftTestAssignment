@@ -1,5 +1,10 @@
 ﻿using KodisoftTestAssignment.Models;
+using KodisoftTestAssignment.Requests;
+using KodisoftTestAssignment.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
@@ -18,9 +23,9 @@ namespace UnitTests.Services.Feeds
             // Arrange
             var data = new List<FeedCollection>
             {
-                new FeedCollection { ID = 1, Title = "First_Testing_FC" },
-                new FeedCollection { ID = 2, Title = "Second_Testing_FC" },
-                new FeedCollection { ID = 3, Title = "Third_Testing_FC" },
+                new FeedCollection { ID = 1, Title = "First_Testing_FC", UserID = "first" },
+                new FeedCollection { ID = 2, Title = "Second_Testing_FC", UserID = "first" },
+                new FeedCollection { ID = 3, Title = "Third_Testing_FC", UserID = "second" },
             }.AsQueryable();
 
             var mockSet = new Mock<DbSet<FeedCollection>>();
@@ -32,11 +37,18 @@ namespace UnitTests.Services.Feeds
 
             var mockContext = new Mock<MainAppDbContext>();
             mockContext.Setup(c => c.FeedCollections).Returns(mockSet.Object);
+            var loggerMock = new Mock<ILogger<NewsServices>>();
 
-            var service = new KodisoftTestAssignment.Services.NewsServices(mockContext.Object);
+            var service = new NewsServices(mockContext.Object, loggerMock.Object);
+
+            var request = new GetFeedCollectionRequest
+            {
+                UserId = "first",
+                FeedCollectionID = 1
+            };
 
             // Act
-            var FC = service.GetFeedCollection(1);
+            var FC = service.GetFeedCollection(request);
 
             // Assert
             Assert.IsNotNull(FC);

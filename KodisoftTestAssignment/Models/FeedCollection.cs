@@ -1,8 +1,4 @@
-﻿using KodisoftTestAssignment.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace KodisoftTestAssignment.Models
 {
@@ -10,8 +6,10 @@ namespace KodisoftTestAssignment.Models
     {
         public int ID { get; set; }
 
-        public int UserID { get; set; }
+        public string UserID { get; set; }
 
         public string Title { get; set; }
+
+        public ICollection<FeedCollectionFeed> FeedCollectionFeeds { get; } = new List<FeedCollectionFeed>();
     }
 }

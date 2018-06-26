@@ -1,14 +1,19 @@
 ﻿using KodisoftTestAssignment.Models;
+using Microsoft.Extensions.Logging;
 
 namespace KodisoftTestAssignment.Services
 {
     public partial class NewsServices
     {
-        private readonly MainAppDbContext _context;
+        private readonly MainAppDbContext _dbContext;
+        private readonly ILogger<NewsServices> _logger;
 
-        public NewsServices(MainAppDbContext context)
+        public NewsServices(
+            MainAppDbContext dbContext, 
+            ILogger<NewsServices> logger)
         {
-            _context = context;
+            _dbContext = dbContext;
+            _logger = logger;
         }
     }
 }

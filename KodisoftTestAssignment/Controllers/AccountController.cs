@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,8 +8,6 @@ using Microsoft.Extensions.Options;
 using JWT;
 using JWT.Serializers;
 using JWT.Algorithms;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using KodisoftTestAssignment.Models;
 using Microsoft.Extensions.Logging;
 

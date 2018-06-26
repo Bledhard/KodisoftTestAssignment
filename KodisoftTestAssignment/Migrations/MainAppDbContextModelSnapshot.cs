@@ -19,6 +19,23 @@ namespace KodisoftTestAssignment.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("KodisoftTestAssignment.Models.Feed", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("FeedType");
+
+                    b.Property<string>("Link");
+
+                    b.Property<string>("Title");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Feeds");
+                });
+
             modelBuilder.Entity("KodisoftTestAssignment.Models.FeedCollection", b =>
                 {
                     b.Property<int>("ID")
@@ -27,32 +44,24 @@ namespace KodisoftTestAssignment.Migrations
 
                     b.Property<string>("Title");
 
-                    b.Property<int>("UserID");
+                    b.Property<string>("UserID");
 
                     b.HasKey("ID");
 
                     b.ToTable("FeedCollections");
                 });
 
-            modelBuilder.Entity("KodisoftTestAssignment.Models.RssFeed", b =>
+            modelBuilder.Entity("KodisoftTestAssignment.Models.FeedCollectionFeed", b =>
                 {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<int>("FeedCollectionID");
 
-                    b.Property<string>("Content");
+                    b.Property<int>("FeedID");
 
-                    b.Property<int>("FeedType");
+                    b.HasKey("FeedCollectionID", "FeedID");
 
-                    b.Property<string>("Link");
+                    b.HasIndex("FeedID");
 
-                    b.Property<DateTime>("PublishDate");
-
-                    b.Property<string>("Title");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Feeds");
+                    b.ToTable("FeedCollectionFeed");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -214,6 +223,19 @@ namespace KodisoftTestAssignment.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("KodisoftTestAssignment.Models.FeedCollectionFeed", b =>
+                {
+                    b.HasOne("KodisoftTestAssignment.Models.FeedCollection", "FeedCollection")
+                        .WithMany("FeedCollectionFeeds")
+                        .HasForeignKey("FeedCollectionID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("KodisoftTestAssignment.Models.Feed", "Feed")
+                        .WithMany("FeedCollectionFeeds")
+                        .HasForeignKey("FeedID")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

@@ -53,7 +53,7 @@ namespace KodisoftTestAssignment.Migrations
                 {
                     ID = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    UserID = table.Column<int>(nullable: false),
+                    UserID = table.Column<string>(nullable: true),
                     Title = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -69,8 +69,6 @@ namespace KodisoftTestAssignment.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Link = table.Column<string>(nullable: true),
                     Title = table.Column<string>(nullable: true),
-                    Content = table.Column<string>(nullable: true),
-                    PublishDate = table.Column<DateTime>(nullable: false),
                     FeedType = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -184,6 +182,30 @@ namespace KodisoftTestAssignment.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "FeedCollectionFeed",
+                columns: table => new
+                {
+                    FeedCollectionID = table.Column<int>(nullable: false),
+                    FeedID = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FeedCollectionFeed", x => new { x.FeedCollectionID, x.FeedID });
+                    table.ForeignKey(
+                        name: "FK_FeedCollectionFeed_FeedCollections_FeedCollectionID",
+                        column: x => x.FeedCollectionID,
+                        principalTable: "FeedCollections",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_FeedCollectionFeed_Feeds_FeedID",
+                        column: x => x.FeedID,
+                        principalTable: "Feeds",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -222,6 +244,11 @@ namespace KodisoftTestAssignment.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FeedCollectionFeed_FeedID",
+                table: "FeedCollectionFeed",
+                column: "FeedID");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -242,16 +269,19 @@ namespace KodisoftTestAssignment.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "FeedCollections");
-
-            migrationBuilder.DropTable(
-                name: "Feeds");
+                name: "FeedCollectionFeed");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "FeedCollections");
+
+            migrationBuilder.DropTable(
+                name: "Feeds");
         }
     }
 }

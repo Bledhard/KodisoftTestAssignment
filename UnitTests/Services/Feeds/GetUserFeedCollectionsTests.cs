@@ -6,11 +6,16 @@ using Moq;
 using Microsoft.EntityFrameworkCore;
 using KodisoftTestAssignment.Models;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using KodisoftTestAssignment.Services;
+using KodisoftTestAssignment.Requests;
 
 namespace UnitTests.Services.Feeds
 {
     [TestClass]
-    public class GetAllFeedCollectionsTests
+    public class GetUserFeedCollectionsTests
     {
         [TestMethod]
         public void MethodReturnedDesired()
@@ -18,9 +23,9 @@ namespace UnitTests.Services.Feeds
             // Arrange
             var data = new List<FeedCollection>
             {
-                new FeedCollection { ID = 1, Title = "First_Testing_FC" },
-                new FeedCollection { ID = 2, Title = "Second_Testing_FC" },
-                new FeedCollection { ID = 3, Title = "Third_Testing_FC" },
+                new FeedCollection { ID = 1, Title = "First_Testing_FC", UserID = "first" },
+                new FeedCollection { ID = 2, Title = "Second_Testing_FC", UserID = "first" },
+                new FeedCollection { ID = 3, Title = "Third_Testing_FC", UserID = "second" },
             }.AsQueryable();
 
             var mockSet = new Mock<DbSet<FeedCollection>>();
@@ -32,15 +37,21 @@ namespace UnitTests.Services.Feeds
 
             var mockContext = new Mock<MainAppDbContext>();
             mockContext.Setup(c => c.FeedCollections).Returns(mockSet.Object);
+            var loggerMock = new Mock<ILogger<NewsServices>>();
 
-            var service = new KodisoftTestAssignment.Services.NewsServices(mockContext.Object);
+            var service = new NewsServices(mockContext.Object, loggerMock.Object);
+
+            var request = new GetUserFeedCollectionsRequest
+            {
+                UserId = "first"
+            };
 
             // Act
-            var FCs = service.GetAllFeedCollections();
+            var FCs = service.GetUserFeedCollections(request);
 
             // Assert
             Assert.IsNotNull(FCs);
-            Assert.AreEqual(3, FCs.Count);
+            Assert.AreEqual(2, FCs.Count);
             Assert.AreEqual("First_Testing_FC", FCs[0].Title);
             Assert.AreEqual("Second_Testing_FC", FCs[1].Title);
             Assert.AreEqual("Third_Testing_FC", FCs[2].Title);

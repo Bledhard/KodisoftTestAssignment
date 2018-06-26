@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Sinks.Elasticsearch;
 using KodisoftTestAssignment.Models;
+using KodisoftTestAssignment.Services;
 
 namespace KodisoftTestAssignment
 {
@@ -70,6 +71,8 @@ namespace KodisoftTestAssignment
                 ValidAudience = audience
             };
 
+            services.AddTransient<NewsServices>();
+
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -99,7 +102,7 @@ namespace KodisoftTestAssignment
             }
 
             loggerFactory.AddSerilog();
-
+            
             app.UseExceptionHandler();
             app.UseAuthentication();
 
