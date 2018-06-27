@@ -90,6 +90,8 @@ namespace KodisoftTestAssignment
                 cfg.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             });
 
+            services.AddMemoryCache();
+
             services.AddMvc();
         }
 

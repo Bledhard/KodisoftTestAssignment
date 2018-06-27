@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace KodisoftTestAssignment.Services
 {
@@ -24,56 +25,89 @@ namespace KodisoftTestAssignment.Services
                     return FeedType.Atom;
                 }
             }
-            throw new ArgumentException("Invalid type of feed: " + url + ";");
+            throw new FormatException("Invalid type of feed: " + url + ".");
         }
 
-        public void AddFeed(string url)
+        public int AddFeed(string url)
         {
             try
             {
+                if (_dbContext.Feeds.Any(f => f.Link == url))
+                    {
+                    throw new DuplicateWaitObjectException("This feed is already in database");
+                }
+
                 var feedType = GetFeedType(url);
 
                 switch (feedType)
                 {
                     case FeedType.RSS:
-                        AddRssFeed(url);
-                        break;
+                        return AddRssFeed(url);
                     case FeedType.Atom:
-                        AddAtomFeed(url);
-                        break;
+                        return AddAtomFeed(url);
                     default:
                         throw new NotSupportedException(string.Format("{0} is not supported", feedType.ToString()));
                 }
             }
-            catch (ArgumentException e)
+            catch (NotSupportedException e)
             {
-                _logger.LogError("Error thrown from GetFeedType(string): " + e.Message);
+                _logger.LogError("AddFeed(string): threw NotSupportedException: " + e.Message);
+                return 0;
+            }
+            catch (DuplicateWaitObjectException e)
+            {
+                _logger.LogError("AddFeed(string): threw DuplicateWaitObjectException: " + e.Message);
+                return 0;
+            }
+            catch (FormatException e)
+            {
+                _logger.LogError("GetFeedType(string): threw FormatException: " + e.Message);
+                return 0;
             }
         }
 
-        private void AddRssFeed(string url)
+        private int AddRssFeed(string url)
         {
             XDocument doc = XDocument.Load(url);
-            var feed = from item in doc.Root.Elements()
-                       select new RssFeed
-                       {
-                           Link = url,
-                           Title = item.Elements().First(i => i.Name.LocalName == "title").Value
-                       };
-            _dbContext.Feeds.Add(feed.FirstOrDefault());
-            _dbContext.SaveChanges();
+            var feed = new RssFeed
+            {
+                Link = url,
+                Title = doc.Root.Elements().Elements().First(i => i.Name.LocalName == "title").Value
+            };
+            _dbContext.Feeds.Add(feed);
+            var n = _dbContext.SaveChanges();
+
+            if (n > 0)
+            {
+                _cache.Set("feed_" + feed.ID, feed, new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
+                });
+            }
+
+            return feed.ID;
         }
 
-        private void AddAtomFeed(string url)
+        private int AddAtomFeed(string url)
         {
             XDocument doc = XDocument.Load(url);
             var feed = new AtomFeed
-                       {
-                           Link = url,
-                           Title = doc.Root.Elements().First(i => i.Name.LocalName == "title").Value,
-                       };
+            {
+                Link = url,
+                Title = doc.Root.Elements().First(i => i.Name.LocalName == "title").Value,
+            };
             _dbContext.Feeds.Add(feed);
-            _dbContext.SaveChanges();
+            var n = _dbContext.SaveChanges();
+
+            if (n > 0)
+            {
+                _cache.Set("feed_" + feed.ID, feed, new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
+                });
+            }
+
+            return feed.ID;
         }
 
         public IEnumerable<Item> ParseItems(string url, FeedType feedType)

@@ -4,6 +4,7 @@ using KodisoftTestAssignment.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -38,8 +39,9 @@ namespace UnitTests.Services.Feeds
             var mockContext = new Mock<MainAppDbContext>();
             mockContext.Setup(c => c.FeedCollections).Returns(mockSet.Object);
             var loggerMock = new Mock<ILogger<NewsServices>>();
+            var memoryCacheMock = new Mock<IMemoryCache>();
 
-            var service = new NewsServices(mockContext.Object, loggerMock.Object);
+            var service = new NewsServices(mockContext.Object, loggerMock.Object, memoryCacheMock.Object);
 
             var request = new GetFeedCollectionRequest
             {

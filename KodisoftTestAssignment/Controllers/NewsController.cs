@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System;
 
 namespace KodisoftTestAssignment.Controllers
 {
@@ -26,78 +27,129 @@ namespace KodisoftTestAssignment.Controllers
             _userManager = userManager;
         }
 
-        // Return all Feed Collections for this user
+        /// <summary>
+        /// Get all Feed Collections for this user
+        /// </summary>
+        /// <returns>Feed Collection in JSON format</returns>
         // GET news
         [HttpGet]
-        public string Get()
+        public IActionResult Get()
         {
-            
-            var userId = _userManager.GetUserId(User);
-            _logger.LogInformation("User " + userId + " called method NewsController.Get()");
-
-            var feedCollectionList = _newsServices.GetUserFeedCollections(new GetUserFeedCollectionsRequest
+            try
             {
-                UserId = userId,
+                var userId = _userManager.GetUserId(User);
+                _logger.LogInformation("User " + userId + " called method NewsController.Get()");
 
-            });
+                var feedCollectionList = _newsServices.GetUserFeedCollections(new GetUserFeedCollectionsRequest
+                {
+                    UserId = userId,
 
-            var json = JsonConvert.SerializeObject(feedCollectionList);
+                });
 
-            return json;
+                var json = JsonConvert.SerializeObject(feedCollectionList);
+
+                return Ok(json);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e);
+            }
         }
 
-        // Return FeedCollection with specified id
+        /// <summary>
+        /// Get FeedCollection with specified id
+        /// </summary>
         // GET news/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public IActionResult Get(int id)
         {
-            var userId = _userManager.GetUserId(User);
-            _logger.LogInformation("User " + userId + " called method NewsController.Get(int)");
-
-            var feedCollection = _newsServices.GetFeedCollection(new GetFeedCollectionRequest
+            try
             {
-                UserId = userId,
-                FeedCollectionID = id
-            });
+                var userId = _userManager.GetUserId(User);
+                _logger.LogInformation("User " + userId + " called method NewsController.Get(int)");
 
-            var json = JsonConvert.SerializeObject(feedCollection);
-            return json;
+                var feedCollection = _newsServices.GetFeedCollection(new GetFeedCollectionRequest
+                {
+                    UserId = userId,
+                    FeedCollectionID = id
+                });
+
+                var json = JsonConvert.SerializeObject(feedCollection);
+                return Ok(json);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e);
+            }
         }
 
-        // Create Feed Collection with specified name
+        /// <summary>
+        /// Create Feed Collection with specified name
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns>Feed Collection ID</returns>
         // POST news
         [HttpPost]
-        public int Post([FromBody]CreateFeedCollectionRequest request)
+        public IActionResult Post([FromBody]CreateFeedCollectionRequest request)
         {
-            request.UserId = _userManager.GetUserId(User);
-            _logger.LogInformation("User " + request.UserId + " called method NewsController.Post(string)");
+            try
+            {
+                request.UserId = _userManager.GetUserId(User);
+                _logger.LogInformation("User " + request.UserId + " called method NewsController.Post(string)");
 
-            var id = _newsServices.CreateFeedCollection(request);
-            return id;
-
+                var id = _newsServices.CreateFeedCollection(request);
+                return Ok(id);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e);
+            }
         }
 
-        // Add new feed
+        /// <summary>
+        /// Add new feed
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns>Feed ID</returns>
         // POST news/addfeed
         [HttpPost]
         [Route("addfeed")]
-        public void AddFeed([FromBody]string url)
+        public IActionResult AddFeed([FromBody]string url)
         {
-            var userId = _userManager.GetUserId(User);
-            _logger.LogInformation("User " + userId + " called method NewsController.AddFeed(string)");
-            _newsServices.AddFeed(url);
+            try
+            {
+                var userId = _userManager.GetUserId(User);
+                _logger.LogInformation("User " + userId + " called method NewsController.AddFeed(string)");
+                var id = _newsServices.AddFeed(url);
+                return Ok(id);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e);
+            }
         }
 
-        // Add feed to a collection
+        /// <summary>
+        /// Add feed to a collection
+        /// </summary>
+        /// <param name="request"></param>
         // PUT news
         [HttpPut]
-        public void Put([FromBody]AddFeedToCollectionRequest request)
+        public IActionResult Put([FromBody]AddFeedToCollectionRequest request)
         {
-            request.UserId = _userManager.GetUserId(User);
-            _logger.LogInformation("User " + request.UserId + " called method NewsController.Put(int, int)");
-            
-            _newsServices.AddFeedToCollection(request);
+            try
+            {
+                request.UserId = _userManager.GetUserId(User);
+                _logger.LogInformation("User " + request.UserId + " called method NewsController.Put(int, int)");
 
+                _newsServices.AddFeedToCollection(request);
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e);
+            }
         }
     }
 }

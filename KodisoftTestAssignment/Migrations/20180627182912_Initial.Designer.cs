@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KodisoftTestAssignment.Migrations
 {
     [DbContext(typeof(MainAppDbContext))]
-    [Migration("20180627132422_Initial")]
+    [Migration("20180627182912_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
