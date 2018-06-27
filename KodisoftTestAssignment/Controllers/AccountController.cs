@@ -36,7 +36,7 @@ namespace KodisoftTestAssignment.Controllers
         [HttpPost("sign-in")]
         public async Task<IActionResult> SignIn([FromBody] Credentials credentials)
         {
-            _logger.LogTrace("SignIn Attempt for " + credentials.Email);
+            _logger.LogInformation("SignIn Attempt for " + credentials.Email);
 
             if (ModelState.IsValid)
             {
@@ -44,14 +44,14 @@ namespace KodisoftTestAssignment.Controllers
                 if (result.Succeeded)
                 {
                     var user = await _userManager.FindByEmailAsync(credentials.Email);
-                    _logger.LogTrace(credentials.Email + "was successfully signed in.");
+                    _logger.LogInformation(credentials.Email + "was successfully signed in.");
                     return new JsonResult(new Dictionary<string, object>
                     {
                     { "access_token", GetAccessToken(credentials.Email) },
                     { "id_token", GetIdToken(user) }
                     });
                 }
-                _logger.LogTrace(credentials.Email + " attempt to sign-in was unsuccessful.");
+                _logger.LogInformation(credentials.Email + " attempt to sign-in was unsuccessful.");
                 return new JsonResult("Unable to sign in") { StatusCode = 401 };
             }
             _logger.LogError("Unexpected error happened while signing-in \"" + credentials.Email + "\"");
@@ -61,7 +61,7 @@ namespace KodisoftTestAssignment.Controllers
         [HttpPost]
         public async Task<IActionResult> Register([FromBody] Credentials credentials)
         {
-            _logger.LogTrace("Registration attempt for " + credentials.Email);
+            _logger.LogInformation("Registration attempt for " + credentials.Email);
 
             if (ModelState.IsValid)
             {
@@ -69,7 +69,7 @@ namespace KodisoftTestAssignment.Controllers
                 var result = await _userManager.CreateAsync(user, credentials.Password);
                 if (result.Succeeded)
                 {
-                    _logger.LogTrace("New user \"" + credentials.Email + "\" registered.");
+                    _logger.LogInformation("New user \"" + credentials.Email + "\" registered.");
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return new JsonResult(new Dictionary<string, object>
                     {
@@ -115,7 +115,7 @@ namespace KodisoftTestAssignment.Controllers
             payload.Add("aud", _options.Audience);
             payload.Add("nbf", ConvertToUnixTimestamp(DateTime.Now));
             payload.Add("iat", ConvertToUnixTimestamp(DateTime.Now));
-            payload.Add("exp", ConvertToUnixTimestamp(DateTime.Now.AddDays(7)));
+            payload.Add("exp", ConvertToUnixTimestamp(DateTime.Now.AddHours(2)));
             IJwtAlgorithm algorithm = new HMACSHA256Algorithm();
             IJsonSerializer serializer = new JsonNetSerializer();
             IBase64UrlEncoder urlEncoder = new JwtBase64UrlEncoder();

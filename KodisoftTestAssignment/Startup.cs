@@ -44,14 +44,6 @@ namespace KodisoftTestAssignment
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<MainAppDbContext>(options => 
-                options.UseSqlServer(Configuration.GetConnectionString("MainAppDb")));
-
-            services.AddIdentity<IdentityUser, IdentityRole>()
-                    .AddEntityFrameworkStores<MainAppDbContext>();
-
-            services.Configure<JWTSettings>(Configuration.GetSection("JWTSettings"));
-
             // secretKey contains a secret passphrase only your server knows
             var secretKey = Configuration.GetSection("JWTSettings:SecretKey").Value;
             var issuer = Configuration.GetSection("JWTSettings:Issuer").Value;
@@ -70,6 +62,14 @@ namespace KodisoftTestAssignment
                 ValidateAudience = true,
                 ValidAudience = audience
             };
+
+            services.AddDbContext<MainAppDbContext>(options => 
+                options.UseSqlServer(Configuration.GetConnectionString("MainAppDb")));
+
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                    .AddEntityFrameworkStores<MainAppDbContext>();
+
+            services.Configure<JWTSettings>(Configuration.GetSection("JWTSettings"));
 
             services.AddTransient<NewsServices>();
 

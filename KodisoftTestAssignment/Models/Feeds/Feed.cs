@@ -1,4 +1,5 @@
 ﻿using KodisoftTestAssignment.Enumerators;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -10,6 +11,8 @@ namespace KodisoftTestAssignment.Models
         public string Link { get; set; }
         public string Title { get; set; }
         public FeedType FeedType { get; set; }
+
+        [JsonIgnore]
         public ICollection<FeedCollectionFeed> FeedCollectionFeeds { get; } = new List<FeedCollectionFeed>();
 
         [NotMapped]

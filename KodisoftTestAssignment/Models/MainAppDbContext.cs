@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using KodisoftTestAssignment.Enumerators;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using System;
 
 namespace KodisoftTestAssignment.Models
 {
@@ -15,6 +18,11 @@ namespace KodisoftTestAssignment.Models
             base.OnModelCreating(builder);
             builder.Entity<FeedCollectionFeed>()
                 .HasKey(e => new { e.FeedCollectionID, e.FeedID });
+            builder.Entity<Feed>()
+                .Property(e => e.FeedType)
+                .HasMaxLength(50)
+                .HasConversion(new EnumToNumberConverter<FeedType, int>());
+
         }
 
         public virtual DbSet<Feed> Feeds { get; set; }

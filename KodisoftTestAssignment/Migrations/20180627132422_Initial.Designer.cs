@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KodisoftTestAssignment.Migrations
 {
     [DbContext(typeof(MainAppDbContext))]
-    [Migration("20180626195054_Initial")]
+    [Migration("20180627132422_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,7 +27,8 @@ namespace KodisoftTestAssignment.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("FeedType");
+                    b.Property<int>("FeedType")
+                        .HasMaxLength(50);
 
                     b.Property<string>("Link");
 

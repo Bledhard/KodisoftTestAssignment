@@ -69,7 +69,7 @@ namespace KodisoftTestAssignment.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Link = table.Column<string>(nullable: true),
                     Title = table.Column<string>(nullable: true),
-                    FeedType = table.Column<int>(nullable: false)
+                    FeedType = table.Column<int>(maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {

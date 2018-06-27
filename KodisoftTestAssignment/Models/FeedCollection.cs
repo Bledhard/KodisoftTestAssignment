@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace KodisoftTestAssignment.Models
 {
@@ -6,10 +7,12 @@ namespace KodisoftTestAssignment.Models
     {
         public int ID { get; set; }
 
+        [JsonIgnore]
         public string UserID { get; set; }
 
         public string Title { get; set; }
 
+        [JsonProperty("Feeds")]
         public ICollection<FeedCollectionFeed> FeedCollectionFeeds { get; } = new List<FeedCollectionFeed>();
     }
 }

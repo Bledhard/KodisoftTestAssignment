@@ -26,16 +26,18 @@ namespace KodisoftTestAssignment.Controllers
             _userManager = userManager;
         }
 
+        // Return all Feed Collections for this user
         // GET news
         [HttpGet]
         public string Get()
         {
-            // Return all Feed Collections for this user
-            _logger.LogTrace("User " + _userManager.GetUserAsync(HttpContext.User).Id + " called method NewsController.Get()");
+            
+            var userId = _userManager.GetUserId(User);
+            _logger.LogInformation("User " + userId + " called method NewsController.Get()");
 
             var feedCollectionList = _newsServices.GetUserFeedCollections(new GetUserFeedCollectionsRequest
             {
-                UserId = _userManager.GetUserId(User),
+                UserId = userId,
 
             });
 
@@ -44,53 +46,57 @@ namespace KodisoftTestAssignment.Controllers
             return json;
         }
 
+        // Return FeedCollection with specified id
         // GET news/5
         [HttpGet("{id}")]
-        public string Get(string id)
+        public string Get(int id)
         {
-            // Return FeedCollection with specified id
-            _logger.LogTrace("User " + _userManager.GetUserAsync(HttpContext.User).Id + " called method NewsController.Get(int)");
+            var userId = _userManager.GetUserId(User);
+            _logger.LogInformation("User " + userId + " called method NewsController.Get(int)");
 
             var feedCollection = _newsServices.GetFeedCollection(new GetFeedCollectionRequest
             {
-                UserId = id
+                UserId = userId,
+                FeedCollectionID = id
             });
 
             var json = JsonConvert.SerializeObject(feedCollection);
-
             return json;
         }
 
+        // Create Feed Collection with specified name
         // POST news
         [HttpPost]
-        public int Post([FromBody]string title)
+        public int Post([FromBody]CreateFeedCollectionRequest request)
         {
-            // Create Feed Collection with specified name
-            _logger.LogTrace("User " + _userManager.GetUserAsync(HttpContext.User).Id + " called method NewsController.Post(string)");
+            request.UserId = _userManager.GetUserId(User);
+            _logger.LogInformation("User " + request.UserId + " called method NewsController.Post(string)");
 
-            var id = _newsServices.CreateFeedCollection(new CreateFeedCollectionRequest
-            {
-                UserId = _userManager.GetUserId(User),
-                Title = title
-            });
-
+            var id = _newsServices.CreateFeedCollection(request);
             return id;
 
         }
 
-        // PUT news/5
-        [HttpPut]
-        public void Put([FromBody]int collectionId, [FromBody]int feedId)
+        // Add new feed
+        // POST news/addfeed
+        [HttpPost]
+        [Route("addfeed")]
+        public void AddFeed([FromBody]string url)
         {
-            // Add feed to a collection
-            _logger.LogTrace("User " + _userManager.GetUserAsync(HttpContext.User).Id + " called method NewsController.Put(int, int)");
+            var userId = _userManager.GetUserId(User);
+            _logger.LogInformation("User " + userId + " called method NewsController.AddFeed(string)");
+            _newsServices.AddFeed(url);
+        }
 
-            _newsServices.AddFeedToCollection(new AddFeedToCollectionRequest
-            {
-                UserId = _userManager.GetUserId(User),
-                CollectionId = collectionId,
-                FeedId = feedId
-            });
+        // Add feed to a collection
+        // PUT news
+        [HttpPut]
+        public void Put([FromBody]AddFeedToCollectionRequest request)
+        {
+            request.UserId = _userManager.GetUserId(User);
+            _logger.LogInformation("User " + request.UserId + " called method NewsController.Put(int, int)");
+            
+            _newsServices.AddFeedToCollection(request);
 
         }
     }

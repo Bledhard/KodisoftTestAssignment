@@ -25,7 +25,8 @@ namespace KodisoftTestAssignment.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("FeedType");
+                    b.Property<int>("FeedType")
+                        .HasMaxLength(50);
 
                     b.Property<string>("Link");
 
