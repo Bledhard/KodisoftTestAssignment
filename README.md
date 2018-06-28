@@ -32,7 +32,9 @@ For those, who wants to work with this project:
 
 ## Description
 ### Back-end developer task
-Create an ASP .NET WebAPI (4 or Core) back-end web service for providing news streams from different sources. Service should function like Feedly service (https://feedly.com/).Service should allow clients to manage feed collections, and to access all news items in those collections. Service should extensively cache data to minimize external requests. As a start, use RSS or Atom feeds, but architecture should be extensible to support adding new types of feed sources in the future (3rdparty services, web scraping, etc). Service should return data in its own format, you should create custom models for all data types, not just redirect XML feeds to the clients. This should be a headless Web API REST service, no UI is necessary. 
+Create an ASP .NET WebAPI (4 or Core) back-end web service for providing news streams from different sources. Service should function like Feedly service (https://feedly.com/).
+Service should allow clients to manage feed collections, and to access all news items in those collections. Service should extensively cache data to minimize external requests. As a start, use RSS or Atom feeds, but architecture should be extensible to support adding new types of feed sources in the future (3rdparty services, web scraping, etc). Service should return data in its own format, you should create custom models for all data types, not just redirect XML feeds to the clients. 
+This should be a headless Web API REST service, no UI is necessary. 
 
 Necessary functions:
 - Create a new collection (returns collection Id)
