@@ -1,6 +1,26 @@
 # KodisoftTestAssignment
 
-Used technologies:
+### Nota Bene:
+For those, who wants to work with this project:
+- MS SQL DB is not docked in repo. You need to create it on your own computer via following:
+  - Change in application.json DB's connectionString to whatever you want
+  - In Visual Studio Package Manager Console tab:
+    ```
+    Add-Migration Initial
+    Update-Database
+    ```
+- Logging is established via Docker-ElasticSearch-Kibana stack. To work with logging you need:
+  - install Docker
+  - open KodisoftTestAssignment/KodisoftTestAssignment/docker folder in command line
+  - run the docker compose command to spin up the containers:
+    ```
+    docker-compose up -d
+    ```
+  -  first time you run this command it can take some time to load images from docker registry
+  -  once it's completed, check that ElasticSearch and Kibana are up and running (I am personally using Kitematic for that)
+
+
+### Used technologies:
 - ASP .Net Core 2.0;
 - SQL (mssqllocaldb) and EF Core 2.0: db interactions;
 - MemoryCache: for feed caching;
