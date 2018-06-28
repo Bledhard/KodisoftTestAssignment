@@ -11,6 +11,11 @@ namespace KodisoftTestAssignment.Services
 {
     public partial class NewsServices
     {
+        public List<Feed> GetAllFeeds()
+        {
+            return _newsRepository.GetAllFeeds();
+        }
+
         private FeedType GetFeedType(string url)
         {
             XDocument doc = XDocument.Load(url);

@@ -108,9 +108,9 @@ namespace KodisoftTestAssignment.Controllers
         /// </summary>
         /// <param name="url"></param>
         /// <returns>Feed ID</returns>
-        // POST news/addfeed
+        // POST news/feeds
         [HttpPost]
-        [Route("addfeed")]
+        [Route("feeds")]
         public IActionResult AddFeed([FromBody]string url)
         {
             try
@@ -121,6 +121,26 @@ namespace KodisoftTestAssignment.Controllers
                 return Ok(id);
             }
             catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Get all feeds
+        /// </summary>
+        [HttpGet]
+        [Route("feeds")]
+        public IActionResult GetAllFeeds()
+        {
+            try
+            {
+                var userId = _requestUserProvider.GetUserId();
+                _logger.LogInformation("User " + userId + " called method NewsController.GetAllFeeds()");
+                var feeds = _newsServices.GetAllFeeds();
+                return Ok(feeds);
+            }
+            catch(Exception e)
             {
                 return BadRequest(e.Message);
             }
