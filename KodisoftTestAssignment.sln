@@ -5,7 +5,9 @@ VisualStudioVersion = 15.0.27428.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KodisoftTestAssignment", "KodisoftTestAssignment\KodisoftTestAssignment.csproj", "{8D661D82-2925-46A5-B44C-AAAAA1A3B075}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{417E0C16-F810-4627-93B4-1B8815BE691F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{417E0C16-F810-4627-93B4-1B8815BE691F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationApplication", "PresentationApplication\PresentationApplication.csproj", "{CA756301-0B38-47C0-953D-CC13BA9DFA12}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{417E0C16-F810-4627-93B4-1B8815BE691F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{417E0C16-F810-4627-93B4-1B8815BE691F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{417E0C16-F810-4627-93B4-1B8815BE691F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA756301-0B38-47C0-953D-CC13BA9DFA12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA756301-0B38-47C0-953D-CC13BA9DFA12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA756301-0B38-47C0-953D-CC13BA9DFA12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA756301-0B38-47C0-953D-CC13BA9DFA12}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

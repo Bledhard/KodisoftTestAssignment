@@ -1,0 +1,17 @@
+﻿@{
+    var feedCollections = (List<FeedCollection>)ViewData["feedCollections"];
+}
+
+<h1>Feed collections:</h1>
+<div class="container">
+    <div class="row">
+        <ul>
+            @foreach (var feedCollection in feedCollections)
+            {
+                <li>
+                    @Html.ActionLink(feedCollection.Title, "FeedCollection", "Home", new { id = feedCollection.ID }, null)
+                </li>
+            }
+        </ul>
+    </div>
+</div>

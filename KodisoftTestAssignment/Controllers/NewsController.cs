@@ -152,7 +152,6 @@ namespace KodisoftTestAssignment.Controllers
         /// <param name="request"></param>
         // PUT news
         [HttpPut]
-        [ValidateAntiForgeryToken]
         public IActionResult Put([FromBody]AddFeedToCollectionRequest request)
         {
             try

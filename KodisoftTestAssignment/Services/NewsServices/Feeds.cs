@@ -136,7 +136,7 @@ namespace KodisoftTestAssignment.Services
                 var entries = from item in doc.Root.Elements().Where(i => i.Name.LocalName == "entry")
                               select new Item
                               {
-                                  Content = item.Elements().FirstOrDefault(i => i.Name.LocalName == "content")?.Value,
+                                  Content = item.Elements().FirstOrDefault(i => i.Name.LocalName == "summary")?.Value,
                                   Link = item.Elements().FirstOrDefault(i => i.Name.LocalName == "link")?.Attribute("href")?.Value,
                                   PublishDate = ParseDate(item.Elements().FirstOrDefault(i => i.Name.LocalName == "published")?.Value),
                                   Title = item.Elements().FirstOrDefault(i => i.Name.LocalName == "title")?.Value

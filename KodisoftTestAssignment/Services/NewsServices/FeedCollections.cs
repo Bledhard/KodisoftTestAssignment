@@ -13,29 +13,40 @@ namespace KodisoftTestAssignment.Services
     {
         public void AddFeedToCollection(AddFeedToCollectionRequest request)
         {
-            _logger.LogInformation("User " + request.UserId + " called method AddFeedToCollection(int, int)");
+            try
+            {
+                _logger.LogInformation("User " + request.UserId + " called method AddFeedToCollection(int, int)");
 
-            if(request.FeedId == 0 || _newsRepository.GetFeed(request.FeedId) == null)
-            {
-                _logger.LogWarning("AddFeedToCollection threw ArgumentException: User #" + request.UserId +
-                    " gave improper feedId.");
-                throw new ArgumentException("This feed doesn't exist.");
+                if (request.FeedId == 0 || _newsRepository.GetFeed(request.FeedId) == null)
+                {
+                    _logger.LogWarning("AddFeedToCollection threw ArgumentException: User #" + request.UserId +
+                        " gave improper feedId.");
+                    throw new ArgumentException("This feed doesn't exist.");
+                }
+                if (request.FeedCollectionId == 0 || _newsRepository.GetFeedCollection(request.FeedCollectionId) == null)
+                {
+                    _logger.LogWarning("AddFeedToCollection threw ArgumentException: User #" + request.UserId +
+                        " gave improper feedCollectionId.");
+                    throw new ArgumentException("This feed collection doesn't exist.");
+                }
+                if (_newsRepository.Contains(request.FeedCollectionId, request.FeedId))
+                {
+                    _logger.LogWarning("AddFeedToCollection threw ArgumentException: User #" + request.UserId +
+                        " tried to add Feed to Feed Collection 2nd time.");
+                    throw new DuplicateWaitObjectException("This feed collection already contains this feed.");
+                }
             }
-            if(request.FeedCollectionId == 0 || _newsRepository.GetFeedCollection(request.FeedCollectionId) == null)
+            catch(InvalidOperationException e)
             {
-                _logger.LogWarning("AddFeedToCollection threw ArgumentException: User #" + request.UserId +
-                    " gave improper feedCollectionId.");
-                throw new ArgumentException("This feed collection doesn't exist.");
-            }
-            if(_newsRepository.Contains(request.FeedCollectionId, request.FeedId))
-            {
-                _logger.LogWarning("AddFeedToCollection threw ArgumentException: User #" + request.UserId +
-                    " tried to add Feed to Feed Collection 2nd time.");
-                throw new DuplicateWaitObjectException("This feed collection already contains this feed.");
+                _logger.LogWarning("AddFeedToCollection threw InvalidOperationException: User #" + request.UserId +
+                        " tried to work with non-existing Feed or Feed Collection.");
+                throw e;
             }
 
             _newsRepository.Add(request.FeedCollectionId, request.FeedId);
             _newsRepository.SaveChanges();
+
+            _cache.Remove("fc_" + request.FeedCollectionId);
         }
 
         public int CreateFeedCollection(CreateFeedCollectionRequest request)

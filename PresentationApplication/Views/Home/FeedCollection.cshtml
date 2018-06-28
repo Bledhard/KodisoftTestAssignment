@@ -1,0 +1,146 @@
+﻿@using PresentationApplication.Models
+@{
+    var feedCollection = (FeedCollection)ViewData["feedCollection"];
+    var feedsInFC = (List<Feed>)ViewData["feedsInFC"];
+    var notUsedFeeds = (List<Feed>)ViewData["notUserFeeds"];
+    var news = (List<Item>)ViewData["news"];
+    ViewData["Title"] = feedCollection.Title;
+}
+
+
+<style>
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0,0,0);
+        background-color: rgba(0,0,0,0.4);
+    }
+
+    .modal-header, .modal-body {
+        padding: 2px 16px;
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+</style>
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="container">
+    <div class="row">
+        <div class="col-xs-2">
+            <ul>
+                @foreach(var feed in feedsInFC)
+            {
+                <li>
+                    @feed.Title
+                </li>
+            }
+            </ul>
+            <button id="popupBtn">Add new feed</button>
+        </div>
+        <div class="col-xs-10">
+            @foreach(var article in news)
+            {
+            <h3>
+                @article.Title
+            </h3>
+            <h4>
+                @article.PublishDate
+            </h4>
+            <h5>
+                @Html.Raw(article.Content)
+                <a href="@article.Link">read more...</a>
+            </h5>
+            }
+        </div>
+    </div>
+</div>
+
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close">&times;</span>
+            <h2>Add feed</h2>
+        </div>
+        <div class="modal-body">
+            <ul>
+                @foreach(var feed in notUsedFeeds) {
+                <li>
+                    <a id="@feed.ID" onclick="addFeed(event)" class="notUsedFeed">@feed.Title</a>
+                </li>
+                }
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    var modal = document.getElementById('modal');
+    var btn = document.getElementById("popupBtn");
+    var span = document.getElementsByClassName("close")[0];
+
+    btn.onclick = function () {
+        modal.style.display = "block";
+    }
+
+    span.onclick = function () {
+        modal.style.display = "none";
+    }
+
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    function addFeed(e)
+    {
+        var data = JSON.stringify({
+            "feedCollectionId": @feedCollection.ID,
+            "feedId": e.target.id
+        });
+
+        var url = "@Url.Action("AddFeedToCollection", "Home")";
+
+        var xhr = new XMLHttpRequest();
+
+        xhr.addEventListener("readystatechange", function () {
+            if (this.readyState === 4) {
+                location.reload();
+          }
+        });
+
+        xhr.open("POST", url);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.setRequestHeader("Cache-Control", "no-cache");
+
+        xhr.send(data);
+    }
+</script>
