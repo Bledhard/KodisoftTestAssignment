@@ -1,4 +1,5 @@
-﻿using KodisoftTestAssignment.Models;
+﻿using KodisoftTestAssignment.Interfaces;
+using KodisoftTestAssignment.Models;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
@@ -6,16 +7,16 @@ namespace KodisoftTestAssignment.Services
 {
     public partial class NewsServices
     {
-        private readonly MainAppDbContext _dbContext;
+        private readonly INewsRepository _newsRepository;
         private readonly ILogger<NewsServices> _logger;
         private readonly IMemoryCache _cache;
 
         public NewsServices(
-            MainAppDbContext dbContext, 
+            INewsRepository newsRepository, 
             ILogger<NewsServices> logger,
             IMemoryCache cache)
         {
-            _dbContext = dbContext;
+            _newsRepository = newsRepository;
             _logger = logger;
             _cache = cache;
         }

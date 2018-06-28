@@ -32,7 +32,7 @@ namespace KodisoftTestAssignment.Services
         {
             try
             {
-                if (_dbContext.Feeds.Any(f => f.Link == url))
+                if (_newsRepository.Contains(url))
                     {
                     throw new DuplicateWaitObjectException("This feed is already in database");
                 }
@@ -74,8 +74,8 @@ namespace KodisoftTestAssignment.Services
                 Link = url,
                 Title = doc.Root.Elements().Elements().First(i => i.Name.LocalName == "title").Value
             };
-            _dbContext.Feeds.Add(feed);
-            var n = _dbContext.SaveChanges();
+            _newsRepository.Add(feed);
+            var n = _newsRepository.SaveChanges();
 
             if (n > 0)
             {
@@ -96,8 +96,8 @@ namespace KodisoftTestAssignment.Services
                 Link = url,
                 Title = doc.Root.Elements().First(i => i.Name.LocalName == "title").Value,
             };
-            _dbContext.Feeds.Add(feed);
-            var n = _dbContext.SaveChanges();
+            _newsRepository.Add(feed);
+            var n = _newsRepository.SaveChanges();
 
             if (n > 0)
             {

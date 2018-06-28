@@ -13,6 +13,7 @@ using Serilog;
 using Serilog.Sinks.Elasticsearch;
 using KodisoftTestAssignment.Models;
 using KodisoftTestAssignment.Services;
+using KodisoftTestAssignment.Interfaces;
 
 namespace KodisoftTestAssignment
 {
@@ -91,6 +92,10 @@ namespace KodisoftTestAssignment
             });
 
             services.AddMemoryCache();
+
+            services.AddTransient<IRequestUserProvider, RequestUserProvider>();
+
+            services.AddScoped<INewsRepository, NewsRepository>();
 
             services.AddMvc();
         }

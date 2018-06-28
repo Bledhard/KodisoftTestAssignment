@@ -1,4 +1,5 @@
-﻿using KodisoftTestAssignment.Requests;
+﻿using KodisoftTestAssignment.Interfaces;
+using KodisoftTestAssignment.Requests;
 using KodisoftTestAssignment.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -13,18 +14,18 @@ namespace KodisoftTestAssignment.Controllers
     [Route("api/[controller]")]
     public class NewsController : Controller
     {
-        UserManager<IdentityUser> _userManager;
-        ILogger<NewsController> _logger;
-        NewsServices _newsServices;
+        private readonly ILogger<NewsController> _logger;
+        private readonly NewsServices _newsServices;
+        private readonly IRequestUserProvider _requestUserProvider;
 
         public NewsController(
             ILogger<NewsController> logger,
             NewsServices newsServices,
-            UserManager<IdentityUser> userManager)
+            IRequestUserProvider requestUserProvider)
         {
             _logger = logger;
             _newsServices = newsServices;
-            _userManager = userManager;
+            _requestUserProvider = requestUserProvider;
         }
 
         /// <summary>
@@ -37,14 +38,10 @@ namespace KodisoftTestAssignment.Controllers
         {
             try
             {
-                var userId = _userManager.GetUserId(User);
+                var userId = _requestUserProvider.GetUserId();
                 _logger.LogInformation("User " + userId + " called method NewsController.Get()");
 
-                var feedCollectionList = _newsServices.GetUserFeedCollections(new GetUserFeedCollectionsRequest
-                {
-                    UserId = userId,
-
-                });
+                var feedCollectionList = _newsServices.GetUserFeedCollections(userId);
 
                 var json = JsonConvert.SerializeObject(feedCollectionList);
 
@@ -52,7 +49,7 @@ namespace KodisoftTestAssignment.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e);
+                return BadRequest(e.Message);
             }
         }
 
@@ -65,7 +62,7 @@ namespace KodisoftTestAssignment.Controllers
         {
             try
             {
-                var userId = _userManager.GetUserId(User);
+                var userId = _requestUserProvider.GetUserId();
                 _logger.LogInformation("User " + userId + " called method NewsController.Get(int)");
 
                 var feedCollection = _newsServices.GetFeedCollection(new GetFeedCollectionRequest
@@ -79,7 +76,7 @@ namespace KodisoftTestAssignment.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e);
+                return BadRequest(e.Message);
             }
         }
 
@@ -94,7 +91,7 @@ namespace KodisoftTestAssignment.Controllers
         {
             try
             {
-                request.UserId = _userManager.GetUserId(User);
+                request.UserId = _requestUserProvider.GetUserId();
                 _logger.LogInformation("User " + request.UserId + " called method NewsController.Post(string)");
 
                 var id = _newsServices.CreateFeedCollection(request);
@@ -102,7 +99,7 @@ namespace KodisoftTestAssignment.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e);
+                return BadRequest(e.Message);
             }
         }
 
@@ -118,14 +115,14 @@ namespace KodisoftTestAssignment.Controllers
         {
             try
             {
-                var userId = _userManager.GetUserId(User);
+                var userId = _requestUserProvider.GetUserId();
                 _logger.LogInformation("User " + userId + " called method NewsController.AddFeed(string)");
                 var id = _newsServices.AddFeed(url);
                 return Ok(id);
             }
             catch (Exception e)
             {
-                return BadRequest(e);
+                return BadRequest(e.Message);
             }
         }
 
@@ -135,11 +132,12 @@ namespace KodisoftTestAssignment.Controllers
         /// <param name="request"></param>
         // PUT news
         [HttpPut]
+        [ValidateAntiForgeryToken]
         public IActionResult Put([FromBody]AddFeedToCollectionRequest request)
         {
             try
             {
-                request.UserId = _userManager.GetUserId(User);
+                request.UserId = _requestUserProvider.GetUserId();
                 _logger.LogInformation("User " + request.UserId + " called method NewsController.Put(int, int)");
 
                 _newsServices.AddFeedToCollection(request);
@@ -148,7 +146,7 @@ namespace KodisoftTestAssignment.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e);
+                return BadRequest(e.Message);
             }
         }
     }

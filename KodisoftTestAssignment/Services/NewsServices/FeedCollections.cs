@@ -15,28 +15,44 @@ namespace KodisoftTestAssignment.Services
         {
             _logger.LogInformation("User " + request.UserId + " called method AddFeedToCollection(int, int)");
 
-            if(_dbContext.FeedCollections.First(fc => fc.ID == request.FeedCollectionId)
-                .FeedCollectionFeeds.Any(fcf => fcf.FeedID == request.FeedId))
+            if(request.FeedId == 0 || _newsRepository.GetFeed(request.FeedId) == null)
             {
-                throw new ArgumentException("This feed collection already contains this feed.");
+                _logger.LogWarning("AddFeedToCollection threw ArgumentException: User #" + request.UserId +
+                    " gave improper feedId.");
+                throw new ArgumentException("This feed doesn't exist.");
+            }
+            if(request.FeedCollectionId == 0 || _newsRepository.GetFeedCollection(request.FeedCollectionId) == null)
+            {
+                _logger.LogWarning("AddFeedToCollection threw ArgumentException: User #" + request.UserId +
+                    " gave improper feedCollectionId.");
+                throw new ArgumentException("This feed collection doesn't exist.");
+            }
+            if(_newsRepository.Contains(request.FeedCollectionId, request.FeedId))
+            {
+                _logger.LogWarning("AddFeedToCollection threw ArgumentException: User #" + request.UserId +
+                    " tried to add Feed to Feed Collection 2nd time.");
+                throw new DuplicateWaitObjectException("This feed collection already contains this feed.");
             }
 
-            var feedCollection = _dbContext.FeedCollections.FirstOrDefault(fc => fc.ID == request.FeedCollectionId);
-            var feed = _dbContext.Feeds.FirstOrDefault(f => f.ID == request.FeedId);
-
-            _dbContext.Add(new FeedCollectionFeed { Feed = feed, FeedCollection = feedCollection });
-            _dbContext.SaveChanges();
+            _newsRepository.Add(request.FeedCollectionId, request.FeedId);
+            _newsRepository.SaveChanges();
         }
 
         public int CreateFeedCollection(CreateFeedCollectionRequest request)
         {
             _logger.LogInformation("User " + request.UserId + " called method CreateFeedCollection(string)");
 
-            if (_dbContext.FeedCollections.Any(fc => fc.Title == request.Title && fc.UserID == request.UserId))
+            if(request.Title == "" || request.Title == null)
+            {
+                _logger.LogWarning("CreateFeedCollection threw ArgumentException: User #" + request.UserId +
+                    " gave improper title for Feed Collection.");
+                throw new ArgumentException("Improper title for Feed Collection.");
+            }
+            if (_newsRepository.Contains(request.Title, request.UserId))
             {
                 _logger.LogError("CreateFeedCollection threw ArgumentException: User #" + request.UserId +
                     " has already created Feed Collection with title \"" + request.Title + "\"");
-                throw new ArgumentException("This user has already created Feed Collection with this title.");
+                throw new DuplicateWaitObjectException("This user has already created Feed Collection with this title.");
             }
 
             var feedCollection = new FeedCollection
@@ -44,8 +60,8 @@ namespace KodisoftTestAssignment.Services
                 Title = request.Title,
                 UserID = request.UserId
             };
-            _dbContext.FeedCollections.Add(feedCollection);
-            var n = _dbContext.SaveChanges();
+           _newsRepository.Add(feedCollection);
+            var n = _newsRepository.SaveChanges();
             if (n > 0)
             {
                 _cache.Set("fc_" + feedCollection.ID, feedCollection, new MemoryCacheEntryOptions
@@ -57,11 +73,11 @@ namespace KodisoftTestAssignment.Services
             return feedCollection.ID;
         }
 
-        public List<FeedCollection> GetUserFeedCollections(GetUserFeedCollectionsRequest request)
+        public List<FeedCollection> GetUserFeedCollections(string userId)
         {
-            _logger.LogInformation("User " + request.UserId + " called method GetUserFeedCollections()");
+            _logger.LogInformation("User " + userId + " called method GetUserFeedCollections()");
 
-            return _dbContext.FeedCollections.Where(fc => fc.UserID == request.UserId).ToList();
+            return _newsRepository.GetUserFeedCollections(userId);
         }
 
         public FeedCollection GetFeedCollection(GetFeedCollectionRequest request)
@@ -70,10 +86,7 @@ namespace KodisoftTestAssignment.Services
 
             if (!_cache.TryGetValue("fc_" + request.FeedCollectionID, out FeedCollection feedCollection))
             {
-                feedCollection = _dbContext.FeedCollections
-                                           .Include(e => e.FeedCollectionFeeds)
-                                           .ThenInclude(e => e.Feed)
-                                           .FirstOrDefault(fc => fc.ID == request.FeedCollectionID);
+                feedCollection = _newsRepository.GetFeedCollection(request.FeedCollectionID);
                 if (feedCollection == null)
                 {
                     var message = "There's no FeedCollection with ID=" + request.FeedCollectionID + ".";
