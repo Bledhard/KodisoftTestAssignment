@@ -29,7 +29,7 @@ For those, who wants to work with this project:
 - RestSharp: for api testing and presentation;
 - Docker-ElasticSearch-Kibana-Serilog: for logging;
 - oAuth 2.0: authentication;
-- MSTeset: unit tests.
+- MSTest: unit tests.
 
 ## Description
 ### Back-end developer task
